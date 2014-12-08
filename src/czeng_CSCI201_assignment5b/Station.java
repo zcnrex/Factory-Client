@@ -7,7 +7,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Station implements Serializable{
-	private String name, status;
+	private String name, status, virtualStatus;
 	private int time;
 	private Lock lock = new ReentrantLock();
 	private Condition stationAvailable = lock.newCondition();
@@ -17,6 +17,7 @@ public class Station implements Serializable{
 		this.name = "";
 		this.time = 0;
 		this.status = "Open";
+		this.virtualStatus = "Open";
 	}
 
 	public Station(String name){
@@ -24,6 +25,7 @@ public class Station implements Serializable{
 		this.name = name;
 		this.time = 0;
 		this.status = "Open";
+		this.virtualStatus = "Open";
 	}
 	
 	public Station(String name, int time){
@@ -39,6 +41,14 @@ public class Station implements Serializable{
 	
 	public void setStatus(String s){
 		this.status = s;
+	}
+	
+	public void setVirtualStatus(String s){
+		this.virtualStatus = s;
+	}
+	
+	public String getVirtualStatus(){
+		return virtualStatus;
 	}
 	
 	public void setTime(int n){
@@ -71,12 +81,15 @@ public class Station implements Serializable{
 		return lock;
 	}
 	
+	public Condition getCondition(){
+		return stationAvailable;
+	}
+	
 	public void inUse(int[]p, int[] pos, int time){
 		lock.lock();
 		try {
 			this.time = time;
 
-//			System.out.println("!!!!!!!");
 			while(pos[0] < (p[0] + 0)){
 				Thread.sleep(1);				
 				pos[0]++;

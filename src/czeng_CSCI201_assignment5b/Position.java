@@ -4,16 +4,10 @@ import java.util.HashMap;
 
 public class Position {
 	private int[][] pos;
-	private int anvil, workbench, furnace, saw, painting;
 	private HashMap<String, int[]> hashmap;
 	
-	Position(){
-		anvil = 0;
-		workbench = 0;
-		furnace = 0;
-		saw = 0;
-		painting = 0;
-		pos = new int[29][2];
+	public Position(){
+		pos = new int[30][2];
 		hashmap = new HashMap<String, int[]>();
 		setPosition();
 		
@@ -29,12 +23,17 @@ public class Position {
 	public void setPosition(){
 		String s;
 		
+		s = "Money";
+		pos[29][0] = 20;
+		pos[29][1] = 20;
+		hashmap.put(s, pos[29]);
+		
 		s = "Wood";
 		pos[0][0] = 140;
 		pos[0][1] = 30;
 		hashmap.put(s, pos[0]);
-		s = "Metal";
 		
+		s = "Metal";		
 		pos[1][0] = 280;
 		pos[1][1] = 30;
 		hashmap.put(s, pos[1]);

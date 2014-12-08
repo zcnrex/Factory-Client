@@ -13,10 +13,11 @@ import java.util.Vector;
 
 public class Task implements Serializable{
 	private String status = "", name = "";
-	private int numTask = 0;
+	private int cost;
 	
 	private Vector<TaskPiece> taskPieces = new Vector<TaskPiece>();
 	private Vector<Material> materials = new Vector<Material>();
+	private HashMap<String, Material> material = new HashMap<String, Material>();
 	
 	public Task(){
 		super();
@@ -45,6 +46,10 @@ public class Task implements Serializable{
 		materials.add(m);
 	}
 	
+	public void addMaterial(Material m, String name){
+		material.put(name, m);
+	}
+	
 	public void addMaterials(Vector<Material> a){
 		materials = a;
 	}
@@ -69,8 +74,28 @@ public class Task implements Serializable{
 		return materials.get(i);
 	}
 	
+	public Material getMaterial(String s){
+		return material.get(s);
+	}
+	
 	public void setName(String name){
 		this.name = name;
+	}
+	
+	public void setCost(int n){
+		this.cost = n;
+	}
+	
+	public int getCost(){
+		return cost;
+	}
+	
+	public int getTime(){
+		int time = 0;
+		for (TaskPiece t : taskPieces){
+			time += t.getTime();
+		}
+		return time;
 	}
 	
 	public static Task copy(Task orig) {

@@ -4,25 +4,24 @@ import java.util.HashMap;
 
 //Actually it stores every materials and tools in the factory
 public class Tasks {
-	private HashMap<String, Material> mList;
-	private HashMap<String, Tool> tList;
-	private HashMap<String, Station> sList;
-	private HashMap<String, Integer> toolNumList;
-	private String status, name;
-	private int numWorker = 0;
+	private HashMap<String, Material> mList = new HashMap<String, Material>();
+	private HashMap<String, Tool> tList = new HashMap<String, Tool>();
+	private HashMap<String, Station> sList = new HashMap<String, Station>();
+	private HashMap<String, Integer> materialNumList = new HashMap<String, Integer>();
+	private HashMap<String, Integer> toolNumList = new HashMap<String, Integer>();
+	private int numWorker = 0, money = 100;
 	
 	public Tasks(){
-		mList = new HashMap<String, Material>();
-		tList = new HashMap<String, Tool>();
-		sList = new HashMap<String, Station>();
-		toolNumList = new HashMap<String, Integer>();
 		Material[] m = new Material[3];
 		m[0] = new Material("Wood");
 		mList.put("Wood", m[0]);
+		materialNumList.put(m[0].getName(), 0);
 		m[1] = new Material("Metal");
 		mList.put("Metal", m[1]);
+		materialNumList.put(m[1].getName(), 0);
 		m[2] = new Material("Plastic");
 		mList.put("Plastic", m[2]);
+		materialNumList.put(m[2].getName(), 0);
 		
 		Tool[] t = new Tool[5];
 		t[0] = new Tool("Screwdriver");
@@ -77,20 +76,45 @@ public class Tasks {
 	public void setWorker(int n){
 		this.numWorker = n;
 	}
+
+	public void addNumWorker(int n){
+		this.numWorker += n;
+	}
 	
+	public void takeNumWorker(int n){
+		this.numWorker -= n;
+	}
 	public int getNumWorker(){
 		return this.numWorker;
 	}
 	
-	public void setMaterial(String s, int n){
-		Material m = new Material(s);
-		
-		mList.put(s, m);
+	public void setMaterial(String s, int n, int sellVal, int buyVal){
+//		Material m = new Material(s);
+//		
+//		mList.put(s, m);
+		mList.get(s).setNum(n);
+		mList.get(s).setBuyValue(buyVal);
+		mList.get(s).setSellValue(sellVal);
+		materialNumList.replace(s, n);
 	}
 	
-	public void setTool(String s, int n){
+	public void setTool(String s, int n, int sellVal, int buyVal){
 		tList.get(s).setNum(n);
+		tList.get(s).setBuyValue(buyVal);
+		tList.get(s).setSellValue(sellVal);
 		toolNumList.replace(s, n);
+	}
+	
+	public void setMoney(int n){
+		this.money = n;
+	}
+	
+	public void addMoney(int n){
+		this.money += n;
+	}
+	
+	public void takeMoney(int n){
+		this.money -= n;
 	}
 	
 	public void useVirtualTool(String s, int n){
@@ -113,6 +137,14 @@ public class Tasks {
 	
 	public HashMap<String, Integer> getToolNumber(){
 		return toolNumList;
+	}
+	
+//	public void addTool(String s, int n){
+//		
+//	}
+	
+	public int getMoney(){
+		return money;
 	}
 	
 }

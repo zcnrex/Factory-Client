@@ -2,6 +2,7 @@ package czeng_CSCI201_assignment5b;
 
 import java.awt.Graphics;
 import java.awt.image.ImageObserver;
+import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
@@ -21,9 +22,6 @@ public class Worker extends Thread{
 	private Factory factory;
 	private int workerNum;
 	
-	
-	private Lock lock = new ReentrantLock();
-	private Condition stationAvailable = lock.newCondition();
 	
 	Worker(){
 		pos = new int[2];
@@ -91,12 +89,10 @@ public class Worker extends Thread{
 					sleep(200);
 				}
 	
-				Vector<Integer> virtulTools;
 				for (TaskPiece tp : task.getTaskPieces()){
 					if(!tp.getTools().isEmpty()){
 						p = position.getPosition(tp.getTools().firstElement().getName());
 						move(p, 50, 0);
-						
 						boolean b = true;
 						while(true){
 							b = false;
@@ -112,7 +108,6 @@ public class Worker extends Thread{
 							factory.getTasks().useVirtualTool(t.getName(), t.getNumber());
 						}
 						for(Tool t : tp.getTools()){
-							
 							p = position.getPosition(t.getName());
 							move(p, 50, 0);
 							while(factory.getTasks().getTools().get(t.getName()).getNumber() < t.getNumber()){
@@ -124,14 +119,16 @@ public class Worker extends Thread{
 						}
 					}
 					Station s = tp.getStation();
-						
 					p = position.getPosition(s.getName()+"1");
 					move(p, 0, -80);
 					int a = 1;
 					while(true){
-						if (factory.getTasks().getStations().get(s.getName()+a).getStatus().equals("Open")){
+						if (factory.getTasks().getStations().get(s.getName()+a).getVirtualStatus().equals("Open")){
+							factory.getTasks().getStations().get(s.getName()+a).setVirtualStatus("Closed");
 							p = position.getPosition(s.getName()+a);
 							factory.getTasks().getStations().get(s.getName()+a).inUse(p, pos, s.getTime());
+
+							factory.getTasks().getStations().get(s.getName()+a).setVirtualStatus("Open");
 							break;
 						}
 						if (factory.getTasks().getStations().containsKey(s.getName()+(a+1))){
@@ -163,13 +160,23 @@ public class Worker extends Thread{
 					pos[1]--;
 				}
 				
-				factory.getTaskPool().getTask(i).setStatus("Complete!");
-				factory.setJl(i);
+				factory.removeJl(i);
+				factory.getTaskPool().getTasks().remove(i);
+				factory.getServer().sendMessage("complete");
+				ImgJSON ij = new ImgJSON(task.getName());
+				factory.getServer().sendMessage(ij.getURL());
 				sleep(200);
 			}
+			boolean complete = false;
 			while(true){
-				if(factory.getTaskPool().getTask(factory.getTaskPool().getTasks().size()-1).getStatus().equals("Complete!"))
-					break;
+				complete = true;
+				for (int k = 0; k < factory.getTaskPool().getSize(); k++){
+					if(!factory.getTaskPool().getTask(k).getStatus().equals("Complete!")) {
+						complete = false;
+						break;
+					}
+				}
+				if (complete) break;
 			}
 			
 			while(pos[0] < 1000){			
@@ -201,7 +208,6 @@ public class Worker extends Thread{
 				pos[0]--;
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

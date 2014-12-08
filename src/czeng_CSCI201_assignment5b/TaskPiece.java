@@ -32,4 +32,12 @@ public class TaskPiece implements Serializable{
 	public Vector<Tool> getTools(){
 		return tools;
 	}
+	
+	public int getTime(){
+		int time = 0;
+		for (Station s : stations){
+			time += s.getTime();
+		}
+		return time;
+	}
 }

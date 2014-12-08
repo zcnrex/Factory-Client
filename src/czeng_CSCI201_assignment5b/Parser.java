@@ -23,7 +23,6 @@ public class Parser {
 
 	private StringTokenizer sToken;
 	private String taskName, token;
-	private Vector<JLabel> jl = new Vector<JLabel>();
 	
 	
 	public Parser(File[] files, Factory factory, TaskPool taskPool){
@@ -33,63 +32,38 @@ public class Parser {
 		
 		sb = new StringBuffer();
 		sList = new ArrayList<String>();
-		
-		//iterate through all files
-		for (File file : files){
 
-			//Dont't read hidden files
-			if (!file.isHidden() ){
-				try {
-					br = new BufferedReader(new FileReader(file));
-				
-					String s = null;
-					while ((s = br.readLine()) != null){
-						sb.append(s);
-						sb.append(" ");
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				sList.add(sb.toString());
+		
+		try {
+			br = new BufferedReader(new FileReader("new.rcp"));
+		
+			String s = null;
+			while ((s = br.readLine()) != null){
+				sb.append(s);
+				sb.append(" ");
 			}
-			sb = new StringBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
+		sToken = new StringTokenizer(sb.toString());
+		token = sToken.nextToken();
+		setupTask(sToken, token);
 
-		for(int i = 0; i < sList.size(); i++){
-			
-			sToken = new StringTokenizer(sList.get(i));
-				token = sToken.nextToken();
-				if (token.length()<9){
-					setupTask(sToken, token);
-				}
-				else{
-					factory.setupFactory(sToken, token);
-					continue;
-				}
-				
-				if (sToken.hasMoreElements()){
-				token = sToken.nextToken();
-				}
-				else continue;
-		}
-
-		factory.setTaskToJSP();
 		
 	}
 	
 	public void setupTask(StringTokenizer st, String tk){
 		
-		taskName = tk.substring(1, tk.length()-1);
-		tk = sToken.nextToken();
+		taskName = tk.substring(1, tk.indexOf(":"));
 		Material m;
 		TaskPiece tp = new TaskPiece();
 		int len = 0;
-		for (int j = 0; j < tk.length()-1; j++){
-			len += (int) (Math.pow(10, j) * (Character.getNumericValue(tk.charAt(tk.length()-j-1))));
+		for (int j =  tk.length()-2; j > tk.indexOf("$"); j--){
+			len += (int) (Math.pow(10, tk.length()-2-j) * (Character.getNumericValue(tk.charAt(j))));
 		}
 
 		Task task = new Task(taskName);
+		task.setCost(len);
 		int num = 0;
 		tk = st.nextToken();
 		while (tk.contains(":")){
@@ -101,6 +75,8 @@ public class Parser {
 			}
 			m.setNum(num);
 			task.addMaterial(m);
+			task.addMaterial(m, tk.substring(1,tk.indexOf(":")));
+//			System.out.println(tk.substring(1,tk.indexOf(":")));
 			tk = st.nextToken();
 		}
 		TaskPiece taskpiece = new TaskPiece();
@@ -119,14 +95,14 @@ public class Parser {
 				}
 				else{
 					setStation(st, task.getLastTaskPiece(), tk);
-					tk = st.nextToken();
+					if(st.hasMoreElements()){
+						tk = st.nextToken();
+					}
 				}
 				continue;
 			}
 		}
-		for (int j = 0; j < len; j++){			
-			taskPool.addTask(Task.copy(task));
-		}
+		taskPool.addTask(Task.copy(task));
 		
 	}
 	
